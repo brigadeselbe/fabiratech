@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boutique — Fabira Tech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0c0906;
+      --bg2: #130e09;
+      --accent: #c49a6c;
+      --accent2: #8b5e3c;
+      --cyan: #e8d5b0;
+      --green: #25D366;
+      --white: #f5efe6;
+      --grey: #b5a090;
+      --grey2: #7a6858;
+      --card-bg: rgba(196,154,108,0.05);
+      --border: rgba(196,154,108,0.12);
+      --radius: 20px;
+      --transition: 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Urbanist', sans-serif;
+      font-size: 16px;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CURSOR ── */
+    #cursor { position:fixed; width:12px; height:12px; background:var(--accent); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); mix-blend-mode:screen; }
+    #cursor-ring { position:fixed; width:40px; height:40px; border:1.5px solid rgba(196,154,108,0.5); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:transform .12s ease,width .3s,height .3s; }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top:0; left:0; right:0;
+      z-index: 1000;
+      display: flex; align-items:center; justify-content:space-between;
+      padding: 20px 5%;
+      transition: var(--transition);
+    }
+    nav.scrolled {
+      background: rgba(8,8,16,0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 5%;
+    }
+    .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+    .nav-logo img { height:42px; filter:invert(1) brightness(2); }
+    .nav-logo span { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:0.08em; color:var(--white); }
+    .nav-links { display:flex; align-items:center; gap:32px; list-style:none; }
+    .nav-links a { color:var(--grey); text-decoration:none; font-size:.95rem; font-weight:500; transition:color .3s; position:relative; }
+    .nav-links a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:1.5px; background:var(--accent); transition:width .3s; }
+    .nav-links a:hover { color:var(--white); }
+    .nav-links a:hover::after { width:100%; }
+    .nav-links a.active { color:var(--white); }
+    .nav-links a.active::after { width:100%; }
+    .nav-cta { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:var(--white)!important; padding:10px 24px; border-radius:100px; font-weight:600; font-size:.9rem!important; letter-spacing:0.04em; text-decoration:none; transition:var(--transition); box-shadow:0 0 20px rgba(196,154,108,0.3); }
+    .nav-cta:hover { box-shadow:0 0 36px rgba(196,154,108,0.6); transform:translateY(-1px); }
+    .nav-cta::after { display:none!important; }
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:5px; }
+    .hamburger span { display:block; width:26px; height:2px; background:var(--white); border-radius:2px; }
+    .mobile-nav { display:none; position:fixed; inset:0; background:rgba(8,8,16,0.97); backdrop-filter:blur(20px); z-index:999; flex-direction:column; align-items:center; justify-content:center; gap:32px; }
+    .mobile-nav.open { display:flex; }
+    .mobile-nav a { color:var(--white); text-decoration:none; font-family:'Syne',sans-serif; font-size:2rem; font-weight:700; transition:color .3s; }
+    .mobile-nav a:hover { color:var(--accent); }
+    .mobile-nav-close { position:absolute; top:24px; right:5%; font-size:2rem; cursor:pointer; color:var(--grey); background:none; border:none; }
+
+    /* ── PAGE HERO ── */
+    .page-hero {
+      padding: 140px 5% 70px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(196,154,108,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .page-hero-label {
+      display: inline-flex; align-items:center; gap:8px;
+      color: var(--accent); font-size:.8rem; font-weight:700;
+      letter-spacing:0.16em; text-transform:uppercase;
+      margin-bottom: 20px;
+    }
+    .page-hero-label::before { content:''; display:block; width:24px; height:2px; background:var(--accent); border-radius:2px; }
+    .page-hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 18px;
+    }
+    .page-hero h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .page-hero p {
+      color: var(--grey); font-size: 1.1rem; font-weight: 400;
+      max-width: 500px; margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    /* ── SEARCH BAR ── */
+    .search-wrap {
+      display: flex; justify-content: center;
+      margin-bottom: 48px;
+    }
+    .search-bar {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 14px 24px;
+      width: 100%; max-width: 480px;
+      transition: var(--transition);
+    }
+    .search-bar:focus-within { border-color: rgba(196,154,108,0.5); background: rgba(196,154,108,0.07); }
+    .search-bar input {
+      background: none; border: none; outline: none;
+      color: var(--white); font-family: 'Urbanist', sans-serif;
+      font-size: 1rem; font-weight: 500; width: 100%;
+    }
+    .search-bar input::placeholder { color: var(--grey2); }
+    .search-bar svg { flex-shrink: 0; opacity: .5; }
+
+    /* ── CATEGORY TABS ── */
+    .tabs-wrap {
+      display: flex; justify-content: center;
+      padding: 0 5% 56px;
+    }
+    .tabs {
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .tab {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px;
+      border-radius: 100px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--grey);
+      font-family: 'Urbanist', sans-serif;
+      font-size: .92rem; font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .tab:hover { color: var(--white); border-color: rgba(255,255,255,0.2); }
+    .tab.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-color: transparent;
+      color: var(--white);
+      box-shadow: 0 0 20px rgba(196,154,108,0.3);
+    }
+
+    /* ── PRODUCTS GRID ── */
+    .products-section { padding: 0 5% 100px; }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── PRODUCT CARD ── */
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: var(--transition);
+      display: flex; flex-direction: column;
+    }
+    .product-card:hover { border-color: rgba(196,154,108,0.3); transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+    .product-img {
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, rgba(196,154,108,0.1), rgba(139,94,60,0.08));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .product-img::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(196,154,108,0.15), transparent 70%);
+    }
+    .product-cat-badge {
+      position: absolute; top: 14px; left: 14px;
+      background: rgba(8,8,16,0.75);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 5px 12px;
+      font-size: .72rem; font-weight: 700;
+      color: var(--grey); letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .product-body {
+      padding: 22px 22px 20px;
+      flex: 1; display: flex; flex-direction: column; gap: 8px;
+    }
+    .product-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      line-height: 1.3; letter-spacing: -0.01em;
+    }
+    .product-desc {
+      color: var(--grey); font-size: .9rem;
+      line-height: 1.6; font-weight: 400;
+      flex: 1;
+    }
+    .product-footer {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .product-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      color: var(--accent);
+    }
+    .btn-order {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--green);
+      color: var(--white);
+      padding: 10px 18px;
+      border-radius: 100px;
+      text-decoration: none;
+      font-size: .88rem; font-weight: 700;
+      transition: var(--transition);
+      box-shadow: 0 4px 16px rgba(37,211,102,0.25);
+      white-space: nowrap;
+    }
+    .btn-order:hover { transform: scale(1.04); box-shadow: 0 6px 24px rgba(37,211,102,0.45); }
+    .btn-order svg { flex-shrink: 0; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--grey2);
+      display: none;
+    }
+    .empty-state-icon { font-size: 4rem; margin-bottom: 16px; }
+    .empty-state p { font-size: 1.05rem; }
+
+    /* ── BOTTOM CTA ── */
+    .bottom-cta {
+      margin: 0 5% 80px;
+      padding: 56px 48px;
+      background: linear-gradient(135deg, rgba(196,154,108,0.1), rgba(139,94,60,0.07));
+      border: 1px solid rgba(196,154,108,0.2);
+      border-radius: 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; flex-wrap: wrap;
+    }
+    .bottom-cta-text h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .bottom-cta-text p { color: var(--grey); font-size: 1rem; font-weight: 400; }
+    .bottom-cta-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-wa-big {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--green);
+      color: var(--white);
+      padding: 15px 32px;
+      border-radius: 100px;
+      text-decoration: none;
+      font-size: 1rem; font-weight: 700;
+      box-shadow: 0 0 30px rgba(37,211,102,0.35);
+      transition: var(--transition);
+    }
+    .btn-wa-big:hover { box-shadow: 0 0 50px rgba(37,211,102,0.55); transform: translateY(-2px); }
+    .btn-call-big {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      color: var(--white);
+      padding: 15px 32px;
+      border-radius: 100px;
+      text-decoration: none;
+      font-size: 1rem; font-weight: 600;
+      transition: var(--transition);
+    }
+    .btn-call-big:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.12); }
+
+    /* ── FOOTER ── */
+    footer { padding: 48px 5% 32px; border-top: 1px solid var(--border); }
+    .footer-top { display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap; margin-bottom:36px; }
+    .footer-logo { display:flex; align-items:center; gap:14px; }
+    .footer-logo img { height:44px; filter:invert(1) brightness(2); }
+    .footer-logo-text { font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; letter-spacing:0.06em; }
+    .footer-logo-sub { color:var(--grey); font-size:.85rem; margin-top:3px; }
+    .footer-links { display:flex; gap:28px; flex-wrap:wrap; }
+    .footer-links a { color:var(--grey); text-decoration:none; font-size:.92rem; font-weight:500; transition:color .3s; }
+    .footer-links a:hover { color:var(--white); }
+    .footer-bottom { border-top:1px solid var(--border); padding-top:24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+    .footer-copy { color:var(--grey2); font-size:.85rem; }
+
+    /* ── FLOATING WA ── */
+    .floating-wa { position:fixed; bottom:28px; right:28px; z-index:100; width:58px; height:58px; background:var(--green); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 28px rgba(37,211,102,0.4); text-decoration:none; font-size:1.5rem; transition:var(--transition); }
+    .floating-wa:hover { transform:scale(1.1); box-shadow:0 12px 40px rgba(37,211,102,0.6); }
+
+    /* ── REVEAL ── */
+    .reveal { opacity:0; transform:translateY(30px); transition:opacity .7s ease,transform .7s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .nav-links { display:none; }
+      .hamburger { display:flex; }
+      .bottom-cta { padding:36px 28px; flex-direction:column; }
+    }
+    @media (max-width: 600px) {
+      .products-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+      .page-hero { padding:120px 5% 50px; }
+      .bottom-cta-btns { flex-direction:column; }
+    }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+  </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-close" onclick="closeMobileNav()">✕</button>
+  <a href="index.html" onclick="closeMobileNav()">Accueil</a>
+  <a href="index.html#about" onclick="closeMobileNav()">À propos</a>
+  <a href="boutique.html" onclick="closeMobileNav()">Boutique</a>
+  <a href="index.html#location" onclick="closeMobileNav()">Localisation</a>
+  <a href="tel:8680808" onclick="closeMobileNav()">📞 Appeler</a>
+</div>
+
+<!-- Navbar -->
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">
+    <img src="IMG_0815.jpeg" alt="Fabira Tech Logo">
+    <span>FABIRA TECH</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="index.html#about">À propos</a></li>
+    <li><a href="boutique.html" class="active">Boutique</a></li>
+    <li><a href="index.html#location">Localisation</a></li>
+    <li><a href="tel:8680808" class="nav-cta">📞 Appeler</a></li>
+  </ul>
+  <div class="hamburger" onclick="openMobileNav()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="page-hero">
+  <div class="page-hero-label">Nos produits</div>
+  <h1>Notre <span>Boutique</span></h1>
+  <p>Trouvez ce qu'il vous faut et commandez directement sur WhatsApp — livraison ou retrait en boutique.</p>
+  <!-- Search -->
+  <div class="search-wrap">
+    <div class="search-bar">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Rechercher un produit…" oninput="filterProducts()">
+    </div>
+  </div>
+</div>
+
+<!-- Category Tabs -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="setCategory('all', this)">✦ Tout voir</button>
+    <button class="tab" onclick="setCategory('telephone', this)">📱 Téléphones</button>
+    <button class="tab" onclick="setCategory('audio', this)">🎧 Audio</button>
+    <button class="tab" onclick="setCategory('charge', this)">🔌 Chargeurs</button>
+    <button class="tab" onclick="setCategory('electromenager', this)">🏠 Électroménager</button>
+    <button class="tab" onclick="setCategory('coque', this)">🛡️ Coques</button>
+    <button class="tab" onclick="setCategory('domotique', this)">💡 Domotique</button>
+  </div>
+</div>
+
+<!-- Products -->
+<div class="products-section">
+  <div class="products-grid" id="productsGrid">
+
+    <!-- ══ TÉLÉPHONES ══ -->
+    <div class="product-card reveal" data-cat="telephone" data-name="smartphone samsung galaxy">
+      <div class="product-img">📱<div class="product-cat-badge">Téléphone</div></div>
+      <div class="product-body">
+        <div class="product-name">Smartphone Samsung Galaxy</div>
+        <div class="product-desc">Séries A et M disponibles. Écran AMOLED, grande batterie, appareil photo performant.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20le%20%3A%20*Smartphone%20Samsung%20Galaxy*%0APourriez-vous%20me%20donner%20le%20prix%20et%20les%20d%C3%A9tails%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="telephone" data-name="iphone reconditionné apple">
+      <div class="product-img">🍎<div class="product-cat-badge">Téléphone</div></div>
+      <div class="product-body">
+        <div class="product-name">iPhone Reconditionné</div>
+        <div class="product-desc">iPhone 11, 12, 13 reconditionnés. État impeccable, batterie vérifiée, garantie incluse.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20%3A%20*iPhone%20Reconditionn%C3%A9*%0APourriez-vous%20me%20donner%20le%20prix%20et%20les%20mod%C3%A8les%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="telephone" data-name="téléphone basique bouton pas cher">
+      <div class="product-img">📟<div class="product-cat-badge">Téléphone</div></div>
+      <div class="product-body">
+        <div class="product-name">Téléphone Basique</div>
+        <div class="product-desc">Téléphone simple et robuste, idéal pour appels et SMS. Longue autonomie, très résistant.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20un%20%3A%20*T%C3%A9l%C3%A9phone%20Basique*%0APourriez-vous%20me%20donner%20les%20mod%C3%A8les%20et%20prix%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="telephone" data-name="tablette android">
+      <div class="product-img">📲<div class="product-cat-badge">Tablette</div></div>
+      <div class="product-body">
+        <div class="product-name">Tablette Android</div>
+        <div class="product-desc">Grand écran, parfaite pour regarder des vidéos, lire, travailler ou étudier. Plusieurs tailles disponibles.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20une%20%3A%20*Tablette%20Android*%0APourriez-vous%20me%20donner%20les%20mod%C3%A8les%20et%20prix%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AUDIO ══ -->
+    <div class="product-card reveal" data-cat="audio" data-name="écouteurs tws bluetooth sans fil airpods">
+      <div class="product-img">🎧<div class="product-cat-badge">Audio</div></div>
+      <div class="product-body">
+        <div class="product-name">Écouteurs TWS Bluetooth</div>
+        <div class="product-desc">Écouteurs sans fil avec boîtier de charge. Son clair, confort optimal, autonomie 4h+.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20des%20%3A%20*%C3%89couteurs%20TWS%20Bluetooth*%0APourriez-vous%20me%20donner%20le%20prix%20et%20les%20mod%C3%A8les%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="audio" data-name="enceinte bluetooth portable son basse">
+      <div class="product-img">🔊<div class="product-cat-badge">Audio</div></div>
+      <div class="product-body">
+        <div class="product-name">Enceinte Bluetooth Portable</div>
+        <div class="product-desc">Son puissant et basses profondes. Résistante, autonomie longue durée, idéale en extérieur.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20une%20%3A%20*Enceinte%20Bluetooth%20Portable*%0APourriez-vous%20me%20donner%20le%20prix%20et%20les%20mod%C3%A8les%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="audio" data-name="casque audio filaire musique">
+      <div class="product-img">🎵<div class="product-cat-badge">Audio</div></div>
+      <div class="product-body">
+        <div class="product-name">Casque Audio</div>
+        <div class="product-desc">Casque filaire ou sans fil pour une écoute immersive. Confortable pour de longues sessions.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20un%20%3A%20*Casque%20Audio*%0APourriez-vous%20me%20donner%20les%20mod%C3%A8les%20et%20prix%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CHARGEURS ══ -->
+    <div class="product-card reveal" data-cat="charge" data-name="chargeur rapide usb-c charge rapide 65w">
+      <div class="product-img">⚡<div class="product-cat-badge">Chargeur</div></div>
+      <div class="product-body">
+        <div class="product-name">Chargeur Rapide USB-C</div>
+        <div class="product-desc">Charge ultra-rapide 33W à 65W. Compatible Samsung, iPhone, tous smartphones modernes.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20un%20%3A%20*Chargeur%20Rapide%20USB-C*%0APourriez-vous%20me%20donner%20le%20prix%20et%20les%20mod%C3%A8les%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="charge" data-name="cable usb-c lightning micro-usb données">
+      <div class="product-img">🔌<div class="product-cat-badge">Câble</div></div>
+      <div class="product-body">
+        <div class="product-name">Câbles USB (C / Lightning / Micro)</div>
+        <div class="product-desc">Câbles de données et charge pour tous types d'appareils. Résistants, tressés, longue durée de vie.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20des%20%3A%20*C%C3%A2bles%20USB*%0APourriez-vous%20me%20donner%20les%20types%20et%20prix%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="charge" data-name="power bank batterie externe portable">
+      <div class="product-img">🔋<div class="product-cat-badge">Batterie</div></div>
+      <div class="product-body">
+        <div class="product-name">Power Bank</div>
+        <div class="product-desc">Batterie externe 10 000 à 20 000 mAh. Rechargez votre téléphone n'importe où, plusieurs fois.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20un%20%3A%20*Power%20Bank*%0APourriez-vous%20me%20donner%20les%20capacit%C3%A9s%20et%20prix%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="charge" data-name="chargeur sans fil qi induction">
+      <div class="product-img">🌀<div class="product-cat-badge">Chargeur</div></div>
+      <div class="product-body">
+        <div class="product-name">Chargeur Sans Fil</div>
+        <div class="product-desc">Chargeur à induction Qi. Posez votre téléphone et c'est chargé — sans câble, simple et élégant.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20un%20%3A%20*Chargeur%20Sans%20Fil*%0APourriez-vous%20me%20donner%20le%20prix%20et%20les%20mod%C3%A8les%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ÉLECTROMÉNAGER ══ -->
+    <div class="product-card reveal" data-cat="electromenager" data-name="mixeur blender cuisine fruits légumes">
+      <div class="product-img">🥤<div class="product-cat-badge">Électroménager</div></div>
+      <div class="product-body">
+        <div class="product-name">Mixeur / Blender</div>
+        <div class="product-desc">Mixeur puissant pour jus, smoothies et cuisine. Facile à nettoyer, moteur robuste, plusieurs vitesses.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20un%20%3A%20*Mixeur%20%2F%20Blender*%0APourriez-vous%20me%20donner%20les%20mod%C3%A8les%20et%20prix%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="electromenager" data-name="ventilateur maison bureau air frais">
+      <div class="product-img">🌀<div class="product-cat-badge">Électroménager</div></div>
+      <div class="product-body">
+        <div class="product-name">Ventilateur</div>
+        <div class="product-desc">Ventilateur sur pied ou de table. Silencieux, plusieurs vitesses, parfait pour la saison chaude.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20un%20%3A%20*Ventilateur*%0APourriez-vous%20me%20donner%20les%20mod%C3%A8les%20et%20prix%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="electromenager" data-name="fer à repasser vapeur linge vêtements">
+      <div class="product-img">👔<div class="product-cat-badge">Électroménager</div></div>
+      <div class="product-body">
+        <div class="product-name">Fer à Repasser</div>
+        <div class="product-desc">Fer vapeur puissant pour des vêtements parfaitement repassés. Semelle anti-adhésive, chauffe rapide.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20un%20%3A%20*Fer%20%C3%A0%20Repasser*%0APourriez-vous%20me%20donner%20les%20mod%C3%A8les%20et%20prix%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="electromenager" data-name="bouilloire électrique eau café thé rapide">
+      <div class="product-img">☕<div class="product-cat-badge">Électroménager</div></div>
+      <div class="product-body">
+        <div class="product-name">Bouilloire Électrique</div>
+        <div class="product-desc">Chauffe l'eau en 2 minutes. Idéale pour le café, le thé ou Nescafé. Arrêt automatique intégré.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20une%20%3A%20*Bouilloire%20%C3%89lectrique*%0APourriez-vous%20me%20donner%20les%20mod%C3%A8les%20et%20prix%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ COQUES ══ -->
+    <div class="product-card reveal" data-cat="coque" data-name="coque protection téléphone iphone samsung housse">
+      <div class="product-img">🛡️<div class="product-cat-badge">Coque</div></div>
+      <div class="product-body">
+        <div class="product-name">Coques de Protection</div>
+        <div class="product-desc">Coques pour iPhone, Samsung et toutes marques. Antichoc, transparentes, colorées — pour tous les goûts.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20une%20%3A%20*Coque%20de%20Protection*%0APrecisez%20votre%20mod%C3%A8le%20de%20t%C3%A9l%C3%A9phone%20et%20on%20vous%20trouve%20la%20meilleure%20option%20!%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="coque" data-name="verre trempé protection écran film">
+      <div class="product-img">🔲<div class="product-cat-badge">Protection</div></div>
+      <div class="product-body">
+        <div class="product-name">Verre Trempé</div>
+        <div class="product-desc">Film de protection en verre trempé 9H. Protège l'écran des rayures et chocs sans altérer le tactile.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20un%20%3A%20*Verre%20Tremp%C3%A9*%0APrecisez%20votre%20mod%C3%A8le%20de%20t%C3%A9l%C3%A9phone%20et%20on%20vous%20trouve%20la%20bonne%20taille%20!%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DOMOTIQUE ══ -->
+    <div class="product-card reveal" data-cat="domotique" data-name="ampoule led connectée smart lumière couleur rgb">
+      <div class="product-img">💡<div class="product-cat-badge">Domotique</div></div>
+      <div class="product-body">
+        <div class="product-name">Ampoule LED Connectée</div>
+        <div class="product-desc">Ampoule intelligente multicolore. Contrôlez la couleur et l'intensité depuis votre téléphone via appli.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20une%20%3A%20*Ampoule%20LED%20Connect%C3%A9e*%0APourriez-vous%20me%20donner%20le%20prix%20et%20les%20mod%C3%A8les%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-cat="domotique" data-name="prise intelligente connectée smart minuterie">
+      <div class="product-img">🔌<div class="product-cat-badge">Domotique</div></div>
+      <div class="product-body">
+        <div class="product-name">Prise Intelligente</div>
+        <div class="product-desc">Prise connectée Wi-Fi. Allumez ou éteignez vos appareils à distance depuis votre téléphone.</div>
+        <div class="product-footer">
+          <div class="product-price">Prix sur demande</div>
+          <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20%F0%9F%91%8B%0AJe%20suis%20int%C3%A9ress%C3%A9(e)%20par%20une%20%3A%20*Prise%20Intelligente*%0APourriez-vous%20me%20donner%20le%20prix%20et%20les%20mod%C3%A8les%20disponibles%20%3F%20Merci%20!" target="_blank" class="btn-order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Commander
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-state-icon">🔍</div>
+      <p>Aucun produit trouvé. Essayez un autre mot clé.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom CTA -->
+<div class="bottom-cta reveal">
+  <div class="bottom-cta-text">
+    <h2>Vous ne trouvez pas ce que vous cherchez ?</h2>
+    <p>Contactez-nous directement — on a peut-être ce qu'il vous faut en stock !</p>
+  </div>
+  <div class="bottom-cta-btns">
+    <a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20Je%20cherche%20un%20produit%20qui%20n'est%20pas%20sur%20le%20site.%20Pouvez-vous%20m'aider%20%3F" target="_blank" class="btn-wa-big">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </a>
+    <a href="tel:8680808" class="btn-call-big">📞 86 80 808</a>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-logo">
+      <img src="IMG_0815.jpeg" alt="Fabira Tech">
+      <div>
+        <div class="footer-logo-text">FABIRA TECH</div>
+        <div class="footer-logo-sub">Tout pour votre quotidien 📱🔌</div>
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="index.html">Accueil</a>
+      <a href="index.html#about">À propos</a>
+      <a href="boutique.html">Boutique</a>
+      <a href="index.html#location">Localisation</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 Fabira Tech — Liberté 6, Dakar</div>
+    <div style="color:var(--grey2);font-size:.85rem">Fiable & Accessible 💯</div>
+  </div>
+</footer>
+
+<!-- Floating WhatsApp -->
+<a href="https://wa.me/2218680808?text=Bonjour%20Fabira%20Tech%20!%20Je%20voudrais%20des%20informations%20sur%20vos%20produits." target="_blank" class="floating-wa">💬</a>
+
+<script>
+  /* Cursor */
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; });
+  (function anim(){ cursor.style.left=mx+'px'; cursor.style.top=my+'px'; rx+=(mx-rx)*.12; ry+=(my-ry)*.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(anim); })();
+
+  /* Navbar */
+  window.addEventListener('scroll',()=>{ document.getElementById('navbar').classList.toggle('scrolled',scrollY>50); });
+
+  /* Mobile nav */
+  function openMobileNav(){ document.getElementById('mobileNav').classList.add('open'); }
+  function closeMobileNav(){ document.getElementById('mobileNav').classList.remove('open'); }
+
+  /* Category filter */
+  let activeCategory = 'all';
+  function setCategory(cat, btn) {
+    activeCategory = cat;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    filterProducts();
+  }
+
+  /* Search + filter */
+  function filterProducts() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    const cards = document.querySelectorAll('.product-card');
+    let visible = 0;
+    cards.forEach(card => {
+      const cat = card.dataset.cat;
+      const name = card.dataset.name;
+      const matchCat = activeCategory === 'all' || cat === activeCategory;
+      const matchSearch = !query || name.includes(query);
+      if (matchCat && matchSearch) { card.style.display='flex'; visible++; }
+      else { card.style.display='none'; }
+    });
+    document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  /* Scroll reveal */
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+  },{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
