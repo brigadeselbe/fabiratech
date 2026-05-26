@@ -684,6 +684,74 @@
     @keyframes bounceIn { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
     @keyframes gradientShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
 
+    /* ─── LOADER ────────────────────────────────── */
+    #loader {
+      position: fixed; inset: 0;
+      background: #0c0906;
+      z-index: 99999;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      transition: opacity .7s ease, visibility .7s ease;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loader-inner {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0;
+      animation: loaderAppear .6s ease both;
+    }
+    .loader-logo {
+      width: min(140px, 38vw);
+      filter: invert(1) brightness(1.8);
+      animation: loaderFloat 2s ease infinite alternate;
+    }
+    .loader-brand {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(.95rem, 3.5vw, 1.3rem);
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-top: 18px;
+      text-transform: uppercase;
+    }
+    .loader-tagline {
+      font-size: clamp(.7rem, 2.5vw, .82rem);
+      color: var(--grey2);
+      letter-spacing: 0.08em;
+      margin-top: 6px;
+      font-weight: 500;
+    }
+    .loader-bar-wrap {
+      width: min(180px, 45vw);
+      height: 2px;
+      background: rgba(196,154,108,0.15);
+      border-radius: 2px;
+      margin-top: 28px;
+      overflow: hidden;
+    }
+    .loader-bar-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent2), var(--accent), var(--cyan));
+      border-radius: 2px;
+      animation: loaderFill 2s cubic-bezier(.4,0,.2,1) forwards;
+    }
+    .loader-dots {
+      display: flex; gap: 6px; margin-top: 20px;
+    }
+    .loader-dots span {
+      width: 5px; height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: loaderDot 1.2s ease infinite;
+    }
+    .loader-dots span:nth-child(2) { animation-delay: .2s; }
+    .loader-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes loaderAppear { from{opacity:0;transform:scale(.85) translateY(20px)} to{opacity:1;transform:none} }
+    @keyframes loaderFloat { from{transform:translateY(0)} to{transform:translateY(-8px)} }
+    @keyframes loaderFill { from{width:0} to{width:100%} }
+    @keyframes loaderDot { 0%,100%{opacity:.3;transform:scale(1)} 50%{opacity:1;transform:scale(1.4)} }
+
     /* ─── RESPONSIVE ────────────────────────────── */
     @media (max-width: 900px) {
       #about, #location { grid-template-columns: 1fr; gap: 40px; }
@@ -737,6 +805,21 @@
 <body>
 
 <!-- Custom Cursor -->
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-inner">
+    <img src="IMG_0815.jpeg" alt="Fabira Tech" class="loader-logo">
+    <div class="loader-brand">Fabira Tech</div>
+    <div class="loader-tagline">Tout pour votre quotidien</div>
+    <div class="loader-bar-wrap">
+      <div class="loader-bar-fill"></div>
+    </div>
+    <div class="loader-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
 
@@ -996,12 +1079,19 @@
 </footer>
 
 <!-- Floating WhatsApp -->
-<a href="https://wa.me/2218680808" target="_blank" class="floating-wa">
+<a href="https://wa.me/221786680808" target="_blank" class="floating-wa">
   <span class="floating-wa-tooltip">Discuter sur WhatsApp</span>
   💬
 </a>
 
 <script>
+  /* ── Loader ── */
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hidden');
+    }, 2400);
+  });
+
   /* ── Cursor ── */
   const cursor = document.getElementById('cursor');
   const ring = document.getElementById('cursor-ring');
